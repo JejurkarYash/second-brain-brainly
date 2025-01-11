@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -33,23 +24,23 @@ app.use(express_1.default.json());
 //  cors
 app.use((0, cors_1.default)());
 // for user registration in the db 
-app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/api/v1/signup", async (req, res) => {
     try {
         // parsing the body accrding to schema 
         const body = userSchma_1.userSchema.parse(req.body); // it will throw the error if inputs are invalid
         const username = body.username;
         const password = body.password.toString();
         // hashing the password using bcrypt 
-        const hashPassword = yield bcrypt_1.default.hash(password, 10);
+        const hashPassword = await bcrypt_1.default.hash(password, 10);
         // checking existing user 
-        const existingUser = yield db_1.userModel.findOne({ username });
+        const existingUser = await db_1.userModel.findOne({ username });
         if (existingUser) {
             res.status(403).json({
                 message: "User is already exist !"
             });
             return;
         }
-        yield db_1.userModel.create({
+        await db_1.userModel.create({
             username: username,
             password: hashPassword
         });
@@ -71,15 +62,15 @@ app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
             });
         }
     }
-}));
+});
 // for user login
-app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/api/v1/signin", async (req, res) => {
     try {
         const body = userSchma_1.userSchema.parse(req.body);
         const username = body.username;
         const password = body.password.toString();
         // checking if user exist or not 
-        const existingUser = yield db_1.userModel.findOne({ username });
+        const existingUser = await db_1.userModel.findOne({ username });
         if (!existingUser) {
             res.status(404).json({
                 message: " User Not Found !"
@@ -94,7 +85,7 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
             });
             return;
         }
-        const isPasswordValid = yield bcrypt_1.default.compare(password, storedPasswordHash);
+        const isPasswordValid = await bcrypt_1.default.compare(password, storedPasswordHash);
         if (isPasswordValid) {
             // generating token using jwt
             const token = jsonwebtoken_1.default.sign({
@@ -126,12 +117,12 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
             });
         }
     }
-}));
+});
 //  storing the content in the db
-app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/api/v1/content", middleware_1.userMiddleware, async (req, res) => {
     try {
         const body = userSchma_1.ContentSchemaZod.parse(req.body);
-        yield db_1.contentModel.create({
+        await db_1.contentModel.create({
             "title": body.title,
             "link": body.link,
             "type": body.type,
@@ -154,12 +145,12 @@ app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter
             message: " Internal Error"
         });
     }
-}));
+});
 // for getting all content 
-app.get("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/api/v1/content", middleware_1.userMiddleware, async (req, res) => {
     const userId = req.body.userId;
     // getting the username from userid 
-    const userInfo = yield db_1.userModel.findOne({
+    const userInfo = await db_1.userModel.findOne({
         _id: userId
     });
     if (!userInfo) {
@@ -169,7 +160,7 @@ app.get("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(
         return;
     }
     //  getting the content using user id 
-    const content = yield db_1.contentModel.find({
+    const content = await db_1.contentModel.find({
         userId: userId
     }).populate("userId", "username");
     if (content) {
@@ -183,12 +174,12 @@ app.get("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(
             message: "invalid credentials"
         });
     }
-}));
+});
 // for deleting the contet
-app.delete("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.delete("/api/v1/content", middleware_1.userMiddleware, async (req, res) => {
     const { userId, contentId } = req.body;
     try {
-        const response = yield db_1.contentModel.deleteOne({ _id: contentId, userId });
+        const response = await db_1.contentModel.deleteOne({ _id: contentId, userId });
         if (response.deletedCount === 1) {
             // Successfully deleted
             res.json({
@@ -207,15 +198,15 @@ app.delete("/api/v1/content", middleware_1.userMiddleware, (req, res) => __await
             message: " Internal Error"
         });
     }
-}));
+});
 // for storing the shara links in the db
-app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/api/v1/brain/share", middleware_1.userMiddleware, async (req, res) => {
     try {
         const share = req.body.share;
         const userId = req.body.userId;
         // if the share is false then that means user want to delete the link
         if (!share) {
-            const deleteLink = yield db_1.linkModel.deleteOne({
+            await db_1.linkModel.deleteOne({
                 userId
             });
             res.json({
@@ -223,7 +214,7 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
             });
         }
         // checking if the link is already preseng in the link table  
-        const existingLink = yield db_1.linkModel.findOne({
+        const existingLink = await db_1.linkModel.findOne({
             userId
         });
         if (existingLink) {
@@ -233,7 +224,7 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
         }
         //  creating a fresh link and inserting it into mongodb 
         const hash = (0, generateHash_1.generateHash)(10);
-        const link = yield db_1.linkModel.create({
+        await db_1.linkModel.create({
             hash: hash,
             userId: userId
         });
@@ -249,23 +240,23 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
             });
         }
     }
-}));
+});
 // for getting the shareLink from the db
-app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/api/v1/brain/:shareLink", async (req, res) => {
     // getting hash from parameter 
     const hash = req.params.shareLink;
     try {
         // checking the hash in the link table 
-        const existingLink = yield db_1.linkModel.findOne({
+        const existingLink = await db_1.linkModel.findOne({
             hash
         });
         if (existingLink) {
             // getting all content of the user 
-            const userContents = yield db_1.contentModel.find({
+            const userContents = await db_1.contentModel.find({
                 userId: existingLink.userId
             });
             // getting the user information from the userdi
-            const userInfo = yield db_1.userModel.findOne({
+            const userInfo = await db_1.userModel.findOne({
                 _id: existingLink.userId
             });
             if (userInfo) {
@@ -281,7 +272,8 @@ app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void
             message: " Bad Request"
         });
     }
-}));
+});
 app.listen(PORT, () => {
     console.log("Server is listening on port ", PORT);
 });
+//# sourceMappingURL=index.js.map

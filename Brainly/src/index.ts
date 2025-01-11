@@ -2,14 +2,14 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { userModel, contentModel, linkModel } from './db';
 import bcrypt from 'bcrypt';
-import { z, ZodError } from 'zod';
+import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { userMiddleware } from './middlewares/middleware';
 import cors from 'cors';
 
 
 // importing the user schema
-import { userSchema, ContentSchemaZod, shareScheme } from './userSchma';
+import { userSchema, ContentSchemaZod } from './userSchma';
 import { generateHash } from './generateHash';
 
 
@@ -257,7 +257,7 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
         // if the share is false then that means user want to delete the link
         if (!share) {
 
-            const deleteLink = await linkModel.deleteOne({
+            await linkModel.deleteOne({
                 userId
             })
             res.json({
@@ -280,7 +280,7 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
 
         //  creating a fresh link and inserting it into mongodb 
         const hash = generateHash(10);
-        const link = await linkModel.create({
+        await linkModel.create({
             hash: hash,
             userId: userId
         })

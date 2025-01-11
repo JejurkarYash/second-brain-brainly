@@ -31,3 +31,4 @@ function userMiddleware(req, res, next) {
         });
     }
 }
+//# sourceMappingURL=middleware.js.map

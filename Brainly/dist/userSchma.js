@@ -22,3 +22,4 @@ exports.ContentSchemaZod = zod_1.z.object({
 exports.shareScheme = zod_1.z.object({
     share: zod_1.z.enum(["true", "false"])
 });
+//# sourceMappingURL=userSchma.js.map
