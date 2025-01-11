@@ -1,0 +1,13 @@
+{
+  "build": {
+    "env": {
+      "CI": "false"
+    }
+  },
+  "functions": {
+    "api/**/*.{js,ts}": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "regions": ["iad1"]
+}
