@@ -112,7 +112,7 @@ app.post("/api/v1/signin", async (req, res) => {
             return;
         }
         else {
-            res.status(500).json({
+            res.status(400).json({
                 message: "Internal Error"
             });
         }

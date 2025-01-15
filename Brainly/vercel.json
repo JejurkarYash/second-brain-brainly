@@ -3,22 +3,36 @@
   "builds": [
     {
       "src": "src/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "nodeVersion": "20.x"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/v1/(.*)",
+      "src": "/api/v1/signup",
+      "dest": "/src/index.ts"
+    },
+    {
+      "src": "/api/v1/signin",
+      "dest": "/src/index.ts"
+    },
+    {
+      "src": "/api/v1/content",
+      "methods": ["POST", "GET", "DELETE"],
+      "dest": "/src/index.ts"
+    },
+    {
+      "src": "/api/v1/brain/share",
+      "dest": "/src/index.ts"
+    },
+    {
+      "src": "/api/v1/brain/(.*)",
       "dest": "/src/index.ts"
     }
   ],
+  "regions": ["iad1"],
   "build": {
     "env": {
       "CI": "false"
     }
-  },
-  "regions": ["iad1"]
+  }
 }
