@@ -3,32 +3,22 @@
   "builds": [
     {
       "src": "src/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["./**/*.ts"]
+      }
     }
   ],
   "routes": [
     {
-      "src": "/api/v1/signup",
-      "dest": "/src/index.ts"
-    },
-    {
-      "src": "/api/v1/signin",
-      "dest": "/src/index.ts"
-    },
-    {
-      "src": "/api/v1/content",
-      "methods": ["POST", "GET", "DELETE"],
-      "dest": "/src/index.ts"
-    },
-    {
-      "src": "/api/v1/brain/share",
-      "dest": "/src/index.ts"
-    },
-    {
-      "src": "/api/v1/brain/(.*)",
+      "src": "/api/v1/(.*)",
       "dest": "/src/index.ts"
     }
   ],
+  "env": {
+    "JWT_PASS": "@jwt_pass",
+    "MONGO_URI": "@mongo_uri"
+  },
   "regions": ["iad1"],
   "build": {
     "env": {

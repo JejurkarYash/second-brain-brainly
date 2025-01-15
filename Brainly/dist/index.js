@@ -23,6 +23,12 @@ const jwtPass = process.env.JWT_PASS;
 app.use(express_1.default.json());
 //  cors
 app.use((0, cors_1.default)());
+// a endpoint for testing purpose 
+app.get("/", (req, res) => {
+    res.json({
+        message: "this is testing "
+    });
+});
 // for user registration in the db 
 app.post("/api/v1/signup", async (req, res) => {
     try {

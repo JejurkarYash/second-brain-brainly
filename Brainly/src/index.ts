@@ -32,6 +32,7 @@ app.use(cors());
 
 // a endpoint for testing purpose 
 app.get("/", (req, res) => {
+    
     res.json({
         message: "this is testing "
     })
