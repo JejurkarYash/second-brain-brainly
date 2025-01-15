@@ -27,6 +27,17 @@ app.use(express.json());
 app.use(cors());
 
 
+
+
+
+// a endpoint for testing purpose 
+app.get("/", (req, res) => {
+    res.json({
+        message: "this is testing "
+    })
+})
+
+
 // for user registration in the db 
 app.post("/api/v1/signup", async (req, res) => {
 
